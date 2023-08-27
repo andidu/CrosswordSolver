@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.adorastudios.crosswordsolver.ui.screenMain.MainScreen
 import com.adorastudios.crosswordsolver.ui.theme.CrosswordSolverTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

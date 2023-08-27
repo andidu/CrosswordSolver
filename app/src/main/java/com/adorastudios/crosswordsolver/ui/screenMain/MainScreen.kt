@@ -1,6 +1,12 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.adorastudios.crosswordsolver.ui.screenMain
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -24,12 +31,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,9 +50,16 @@ fun MainScreen(
 ) {
     val state = viewModel.state
 
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+            ) { focusManager.clearFocus() },
     ) {
         Row(
             modifier = Modifier
@@ -142,17 +158,43 @@ fun MainScreen(
                     }
                 }
 
-                when (state.value.words) {
-                    is Words.Loaded -> {
-                        LazyColumn(
-                            modifier = Modifier.weight(1f),
-                        ) {
+                AnimatedContent(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 24.dp, end = 16.dp),
+                    targetState = state.value.words,
+                ) { words ->
+                    when (words) {
+                        is Words.Loaded -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                items(
+                                    items = words.list,
+                                ) {
+                                    WordTile(word = it)
+                                }
+                            }
+                        }
+
+                        Words.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(text = stringResource(id = R.string.loading))
+                            }
+                        }
+
+                        Words.Nothing -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(text = stringResource(id = R.string.nothingToShow))
+                            }
                         }
                     }
-
-                    Words.Loading -> {}
-
-                    Words.Nothing -> {}
                 }
             }
             Box(

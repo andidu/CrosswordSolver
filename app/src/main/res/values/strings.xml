@@ -8,4 +8,8 @@
 
     <string name="contentDescription_minusOne">Minus one</string>
     <string name="contentDescription_plusOne">Plus one</string>
+    <string name="contentDescription_copy">Copy</string>
+
+    <string name="loading">Loading…</string>
+    <string name="nothingToShow">Nothing to show</string>
 </resources>

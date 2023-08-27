@@ -4,11 +4,18 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.adorastudios.crosswordsolver.domain.WordsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val wordsRepository: WordsRepository,
+) : ViewModel() {
     private val _state: MutableState<MainState> = mutableStateOf(MainState())
     val state: State<MainState> = _state
 
@@ -63,5 +70,20 @@ class MainViewModel @Inject constructor() : ViewModel() {
         _state.value = state.value.copy(
             words = Words.Loading,
         )
+
+        val fileId = _state.value.language.fileId
+        val letters = _state.value.letters
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val words = wordsRepository.getWords(
+                fileId = fileId,
+                letters = letters,
+            )
+            withContext(Dispatchers.Main) {
+                _state.value = state.value.copy(
+                    words = if (words.isEmpty()) Words.Nothing else Words.Loaded(words),
+                )
+            }
+        }
     }
 }
