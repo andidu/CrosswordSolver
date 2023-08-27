@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Crossword Solver</string>
+
+    <string name="language_UK">English</string>
+    <string name="language_ES">Spanish</string>
+    <string name="language_FR">French</string>
+    <string name="language_DE">German</string>
+
+    <string name="contentDescription_minusOne">Minus one</string>
+    <string name="contentDescription_plusOne">Plus one</string>
 </resources>
